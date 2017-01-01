@@ -25,7 +25,7 @@ Content-Type:text/html
 ```
 ### Implementation
 
-It's interesting to look at the thread pool implementation: [code](https://github.com/pminkov/wip/blob/master/os/webserver/threadpool.c).
+It's interesting to look at the thread pool implementation: [code](threadpool.c).
 
 ### Debugging
 
