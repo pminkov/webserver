@@ -1,10 +1,8 @@
 /*
-
-Based on this:
+Based on the requirements of this OS class project:
 http://pages.cs.wisc.edu/~dusseau/Classes/CS537-F07/Projects/P2/p2.html
 
 TODO: Clean up debug output.
-
 */
 #include <assert.h>
 #include <netinet/in.h>
@@ -100,7 +98,7 @@ int is_cgi_bin_request(const char *path) {
   return 0;
 }
 
-char *read_from_bin(FILE *fpipe) {
+char *read_file(FILE *fpipe) {
   int capacity = 10;
   char *buf = malloc(capacity);
   int index = 0;
@@ -129,28 +127,25 @@ struct request_pair {
   char *query;
 };
 
-/// 123
-// pet?minkov
-// qq=3
-
-// char *a. This is an address.
-// a[2] = 5;
-// a = malloc(3);
-// 
 struct request_pair extract_query(const char *cgipath_param) {
   struct request_pair ret;
   char *qq = strchr(cgipath_param, '?');
 
-  int path_len = qq - cgipath_param;
-  ret.path = malloc(path_len + 1);
-  strncpy(ret.path, cgipath_param, path_len);
-  ret.path[path_len] = 0;
+  if (qq == NULL) {
+    ret.path = strdup(cgipath_param);
+    ret.query = NULL;
+  } else {
+    int path_len = qq - cgipath_param;
+    ret.path = malloc(path_len + 1);
+    strncpy(ret.path, cgipath_param, path_len);
+    ret.path[path_len] = 0;
 
-  int query_len = strlen(cgipath_param) - path_len - 1;
-  ret.query = malloc(query_len + 1);
-  const char* query_start_pos = cgipath_param + path_len + 1;
-  strncpy(ret.query, query_start_pos, query_len);
-  ret.query[query_len] = '\0';
+    int query_len = strlen(cgipath_param) - path_len - 1;
+    ret.query = malloc(query_len + 1);
+    const char* query_start_pos = cgipath_param + path_len + 1;
+    strncpy(ret.query, query_start_pos, query_len);
+    ret.query[query_len] = '\0';
+  }
 
   return ret;
 }
@@ -159,33 +154,38 @@ void run_cgi(int sockfd, const char *curdir, const char *cgipath_param) {
   char *fullpath;
   struct request_pair req = extract_query(cgipath_param);
 
-  printf("cgipath=[%s]\n", req.path);
-  printf("query=[%s]\n", req.query);
+  char *params;
+  if (req.query) { 
+    params = malloc(strlen(req.query) + 100);
+    sprintf(params, "QUERY_STRING='%s' ", req.query);
+  } else {
+    params = strdup("");
+  }
 
   if (ends_with(req.path, ".py")) {
     // TODO: Overflow possible?
-    char cmdline[MAX_QUERY];
-    sprintf(cmdline, "QUERY_STRING='%s' python ", req.query);
-    fullpath = concat3(cmdline, curdir, req.path);
+    fullpath = concat4(params, "python ", curdir, req.path);
   } else {
-    char cmdline[MAX_QUERY];
-    sprintf(cmdline, "QUERY_STRING='%s'", req.query);
-    fullpath = concat(curdir, req.path);
+    fullpath = concat3(params, curdir, req.path);
   }
 
-  printf("Executing: %s\n", fullpath);
+  free(params);
+  free(req.path);
+  free(req.query);
+
+  printf("Executing: [%s]\n", fullpath);
 
   FILE *fpipe = popen(fullpath, "r");
+  free(fullpath);
 
   if (!fpipe) {
     perror("Problem with popen");
     http_404_reply(sockfd);
   } else {
-    char* result = read_from_bin(fpipe);
+    char* result = read_file(fpipe);
     http_get_reply(sockfd, result);
+    free(result);
   }
-
-  free(fullpath);
 }
 
 void output_static_file(int sockfd, const char *curdir, const char *path) {
@@ -200,8 +200,9 @@ void output_static_file(int sockfd, const char *curdir, const char *path) {
     perror("Problem with fopen");
     http_404_reply(sockfd);
   } else {
-    char *result = read_from_bin(f);
+    char *result = read_file(f);
     http_get_reply(sockfd, result);
+    free(result);
   }
 }
 
@@ -296,8 +297,6 @@ int main() {
     *arg = newsockfd;
     queue_work_item(&pool, handle_socket_thread, arg);
   }
-  
-
 
   close(sockfd);
 

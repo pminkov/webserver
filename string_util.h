@@ -59,4 +59,13 @@ char *concat3(const char *s1, const char *s2, const char *s3) {
   return r;
 }
 
+char *concat4(const char *s1, const char *s2, const char *s3, const char *s4) {
+  char *r = malloc(strlen(s1) + strlen(s2) + strlen(s3) + strlen(s4) + 1);
+  strcpy(r, s1);
+  strcat(r, s2);
+  strcat(r, s3);
+  strcat(r, s4);
+  return r;
+}
+
 #endif

@@ -26,3 +26,13 @@ Content-Type:text/html
 ### Implementation
 
 It's interesting to look at the thread pool implementation: [code](https://github.com/pminkov/wip/blob/master/os/webserver/threadpool.c).
+
+### Debugging
+
+It's pretty easy to create memory leaks in C. Therefore, it's highly recommended to use valgrind to check for them:
+
+```bash
+$ make server && valgrind --leak-check=full  ./server
+```
+
+Run some queries and press `Ctrl-C` in valgrind. You'll see a list of memory leaks.
