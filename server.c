@@ -32,43 +32,37 @@ void error(char *message) {
   exit(1);
 }
 
-void writeln_to_sock(int sockfd, const char *message) {
+void writeln_to_socket(int sockfd, const char *message) {
   write(sockfd, message, strlen(message));
   write(sockfd, "\r\n", 2);
 }
 
-void http_404_reply(int sockfd) {
-  char *content = "<html><body><h1>Not found</h1></body></html>\r\n";
 
+void write_content_to_socket(int sockfd, const char *content) {
   char length_str[100];
   sprintf(length_str, "%d", (int)strlen(content));
 
   char *content_length_str = concat("Content-Length: ", length_str);
-
-  writeln_to_sock(sockfd, "HTTP/1.1 404 Not Found");
-  writeln_to_sock(sockfd, "Server: PetkoWS/1.0 (MacOS)");
-  writeln_to_sock(sockfd, "Content-Type: text/html");
-  writeln_to_sock(sockfd, content_length_str);
-  writeln_to_sock(sockfd, "");
-  writeln_to_sock(sockfd, content);
+  writeln_to_socket(sockfd, "Server: PetkoWS/1.0 (MacOS)");
+  writeln_to_socket(sockfd, "Content-Type: text/html");
+  writeln_to_socket(sockfd, content_length_str);
+  writeln_to_socket(sockfd, "");
+  writeln_to_socket(sockfd, content);
 
   free(content_length_str);
 }
 
+
+void http_404_reply(int sockfd) {
+  writeln_to_socket(sockfd, "HTTP/1.1 404 Not Found");
+
+  static const char *content = "<html><body><h1>Not found</h1></body></html>\r\n";
+  write_content_to_socket(sockfd, content);
+}
+
 void http_get_reply(int sockfd, const char *content) {
-  char length_str[10];
-  sprintf(length_str, "%d", (int)strlen(content));
-
-  char *content_length_str = concat("Content-Length: ", length_str);
-
-  writeln_to_sock(sockfd, "HTTP/1.1 200 OK");
-  writeln_to_sock(sockfd, "Server: PetkoWS/1.0 (MacOS)");
-  writeln_to_sock(sockfd, "Content-Type: text/html");
-  writeln_to_sock(sockfd, content_length_str);
-  writeln_to_sock(sockfd, "");
-  writeln_to_sock(sockfd, content);
-
-  free(content_length_str);
+  writeln_to_socket(sockfd, "HTTP/1.1 200 OK");
+  write_content_to_socket(sockfd, content);
 }
 
 char *read_text_from_socket(int sockfd) {
