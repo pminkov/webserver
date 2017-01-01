@@ -5,16 +5,16 @@
 DEPS = threads.h threadpool.h
 
 %.o: %.c $(DEPS)
-	gcc -c -o $@ $<
+	gcc -c -o $@ $< -pthread
 
 
 OBJ_S = server.o threadpool.o
 server: $(OBJ_S)
-	gcc -o $@ $^
+	gcc -o $@ $^ -pthread
 
 OBJ_TT = threadpool.o test_threadpool.o
 test_threadpool: $(OBJ_TT)
-	gcc -o $@ $^
+	gcc -o $@ $^ -pthread
 
 clean:
 	rm -rf ./server
