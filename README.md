@@ -6,6 +6,7 @@ I wrote this code as an exercise in systems programming with C. This is a simple
 
 The webserver serves cgi scripts, located in the `cgi-bin` subdirectory and static files, located in the `static` subdirectory.
 
+
 ### Usage:
 ```bash
 $ make server
