@@ -14,7 +14,7 @@ TODO: Clean up debug output.
 #include <sys/types.h> 
 #include <unistd.h>
 
-#include "threadpool.h"
+#include "threadpool/threadpool.h"
 #include "string_util.h"
 
 const char* GET = "GET";
@@ -285,8 +285,7 @@ int main() {
   struct sockaddr_in client_addr;
   int cli_len = sizeof(client_addr);
 
-  struct thread_pool pool;
-  init_thread_pool(&pool);
+  struct thread_pool* pool = pool_init(4);
 
   while (1) {
     int newsockfd = accept(sockfd, (struct sockaddr *) &client_addr, (socklen_t *) &cli_len);
@@ -295,9 +294,8 @@ int main() {
 
     int *arg = malloc(sizeof(int));
     *arg = newsockfd;
-    queue_work_item(&pool, handle_socket_thread, arg);
+    pool_add_task(pool, handle_socket_thread, arg);
   }
-
   close(sockfd);
 
   return 0;

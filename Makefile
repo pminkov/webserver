@@ -2,21 +2,16 @@
 # $@ - left side of rule.
 # $^ - right side of rule.
 
-DEPS = threads.h threadpool.h
+DEPS = threadpool/threadpool.h threadpool/threads.h
 
 %.o: %.c $(DEPS)
 	gcc -c -o $@ $< -pthread
 
 
-OBJ_S = server.o threadpool.o
+OBJ_S = server.o threadpool/threadpool.o
 server: $(OBJ_S)
-	gcc -o $@ $^ -pthread
-
-OBJ_TT = threadpool.o test_threadpool.o
-test_threadpool: $(OBJ_TT)
 	gcc -o $@ $^ -pthread
 
 clean:
 	rm -rf ./server
-	rm -rf ./test_threadpool
 	rm -rf ./*.o
