@@ -25,7 +25,7 @@ Content-Type:text/html
 ```
 ### Implementation
 
-It's interesting to look at the [thread pool implementation](threadpool/threadpool.c). There's a separate [repo](https://github.com/pminkov/threadpool) for the thread pool.
+Requests are served by a [thread pool](https://github.com/pminkov/threadpool) of workers.
 
 ### Debugging
 
