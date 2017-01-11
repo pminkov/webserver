@@ -2,16 +2,18 @@
 # $@ - left side of rule.
 # $^ - right side of rule.
 
+CC = gcc -pthread -std=gnu99
+
 DEPS = threadpool/threadpool.h threadpool/threads.h
 
 %.o: %.c $(DEPS)
-	gcc -c -o $@ $< -pthread
+	$(CC) -c -o $@ $<
 
 
 OBJ_S = server.o threadpool/threadpool.o
 server: $(OBJ_S)
-	gcc -o $@ $^ -pthread
+	$(CC) -o $@ $^
 
 clean:
 	rm -rf ./server
-	rm -rf ./*.o
+	find . -name "*.o" -type f -delete
