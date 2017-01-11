@@ -1,3 +1,5 @@
+[![Build Status](https://drone.io/github.com/pminkov/webserver/status.png)](https://drone.io/github.com/pminkov/webserver/latest)<br>
+
 # Webserver
 
 I wrote this code as an exercise in systems programming with C. This is a simple multi-threaded webserver. Each request is executed in a separate thread and the threads are managed by a [thread pool](https://github.com/pminkov/threadpool).
