@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     error("connect");
   }
 
-  char *get_str = malloc(512);
+  char *get_str = malloc(128 + strlen(url));;
   sprintf(get_str, "GET %s HTTP/1.1", url);
   printf("%s", get_str);
   write_to_socket(sockfd, get_str);
@@ -46,6 +46,8 @@ int main(int argc, char **argv) {
   char *result = read_text_from_socket(sockfd);
   printf("From socket: %s\n\n", result);
   free(result);
+
+  close(sockfd);
 
   return 0;
 }
