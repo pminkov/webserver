@@ -22,10 +22,7 @@ TODO: Clean up debug output.
 const char* GET = "GET";
 const char* CGI_BIN_PATH = "/cgi-bin/";
 
-const int MAX_PATH_LEN = 80;
 const int MAX_CWD = 100;
-
-const int MAX_QUERY = 256;
 
 void writeln_to_socket(int sockfd, const char *message) {
   write(sockfd, message, strlen(message));
@@ -68,10 +65,9 @@ char *get_path(char *text) {
   int beg_pos = strlen(GET) + 1;
   char *end_of_path = strchr(text + beg_pos, ' ');
   int end_pos = end_of_path - text;
-  // TODO: Overflow possible. Fix.
-  char *path = malloc(MAX_PATH_LEN);
 
   int pathlen = end_pos - beg_pos;
+  char *path = malloc(pathlen + 1);
   substr(text, beg_pos, pathlen, path);
   path[pathlen] = '\0';
 
@@ -199,8 +195,6 @@ void *handle_socket_thread(void* sockfd_arg) {
   char *text = read_text_from_socket(sockfd);
   printf("From socket: %s\n\n", text);
 
-  char *path = NULL;
-
   if (is_get(text)) {
     char curdir[MAX_CWD];
 
@@ -208,7 +202,7 @@ void *handle_socket_thread(void* sockfd_arg) {
       error("Couldn't read curdir");
     }
 
-    path = get_path(text);
+    char *path = get_path(text);
 
     if (is_cgi_bin_request(path)) {
       run_cgi(sockfd, curdir, path);
@@ -217,13 +211,14 @@ void *handle_socket_thread(void* sockfd_arg) {
       printf("path[%s]\n", path);
       output_static_file(sockfd, curdir, path);
     }
+
+    free(path);
   } else {
     // The server only supports GET.
     http_404_reply(sockfd);
   }
 
   free(text);
-  free(path);
   close(sockfd);
   free(sockfd_arg);
 
