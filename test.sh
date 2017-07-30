@@ -10,7 +10,7 @@ SID=$!
 sleep 1 
 
 PASS=true
-if ! ./client /static/exampl2e_org.html | grep "font-family";  then
+if ! ./client /static/example_org.html | grep "font-family" > /dev/null;  then
   echo "bad request"
   PASS=false
 fi
