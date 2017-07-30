@@ -258,7 +258,7 @@ int create_listening_socket() {
 
   struct sockaddr_in serv_addr;
 
-  int port = 8000;
+  uint16_t port = 8000;
 
   while (1) {
     bzero(&serv_addr, sizeof(serv_addr));
