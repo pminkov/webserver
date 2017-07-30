@@ -251,7 +251,7 @@ int create_listening_socket() {
     bzero(&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
       port++;
@@ -260,7 +260,7 @@ int create_listening_socket() {
     }
   }
 
-  if (listen(sockfd, 5) < 0) error("Couldn't listen");
+  if (listen(sockfd, SOMAXCONN) < 0) error("Couldn't listen");
   printf("Running on port: %d\n", port);
 
   return sockfd;
