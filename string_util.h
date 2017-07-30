@@ -1,6 +1,9 @@
 #ifndef __STRING_UTIL_H
 #define __STRING_UTIL_H
 
+#include <string.h>
+#include <assert.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 int starts_with(char *s, const char *with) {
@@ -65,6 +68,14 @@ char *concat4(const char *s1, const char *s2, const char *s3, const char *s4) {
   strcat(r, s2);
   strcat(r, s3);
   strcat(r, s4);
+  return r;
+}
+
+char *strappend(const char *s1, const char *s2) {
+  char *r = malloc(strlen(s1) + strlen(s2) + 1);
+  strcpy(r, s1);
+  strcat(r, s2);
+  assert(strlen(r) == strlen(s1) + strlen(s2));
   return r;
 }
 

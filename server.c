@@ -4,6 +4,10 @@ http://pages.cs.wisc.edu/~dusseau/Classes/CS537-F07/Projects/P2/p2.html
 
 TODO: Clean up debug output.
 */
+#include "threadpool/threadpool.h"
+#include "utils.h"
+#include "string_util.h"
+
 #include <assert.h>
 #include <netinet/in.h>
 #include <pthread.h>
@@ -14,8 +18,6 @@ TODO: Clean up debug output.
 #include <sys/types.h> 
 #include <unistd.h>
 
-#include "threadpool/threadpool.h"
-#include "string_util.h"
 
 const char* GET = "GET";
 const char* CGI_BIN_PATH = "/cgi-bin/";
@@ -24,11 +26,6 @@ const int MAX_PATH_LEN = 80;
 const int MAX_CWD = 100;
 
 const int MAX_QUERY = 256;
-
-void error(char *message) {
-  perror(message);
-  exit(1);
-}
 
 void writeln_to_socket(int sockfd, const char *message) {
   write(sockfd, message, strlen(message));
@@ -61,18 +58,6 @@ void http_404_reply(int sockfd) {
 void http_get_reply(int sockfd, const char *content) {
   writeln_to_socket(sockfd, "HTTP/1.1 200 OK");
   write_content_to_socket(sockfd, content);
-}
-
-char *read_text_from_socket(int sockfd) {
-  char *buffer = malloc(1024);
-
-  int n = read(sockfd, buffer, 1023);
-  if (n < 0) error("Error reading from socket");
-  buffer[n] = '\0';
-
-  printf("From socket: %s\n\n", buffer);
-
-  return buffer;
 }
 
 int is_get(char *text) {
@@ -212,6 +197,8 @@ void *handle_socket_thread(void* sockfd_arg) {
   printf("Handling socket: %d\n", sockfd);
   
   char *text = read_text_from_socket(sockfd);
+  printf("From socket: %s\n\n", text);
+
   char *path = NULL;
 
   if (is_get(text)) {
