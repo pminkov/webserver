@@ -28,6 +28,24 @@ $ curl localhost:8000/static/example_org.html
   ...
   ...
 </html>
+
+Or you can use the client binary:
+$ make client
+gcc -pthread -std=gnu99 -ggdb -c -o client.o client.c
+gcc -pthread -std=gnu99 -ggdb -o client client.o
+
+$ ./client '/cgi-bin/simple.py?num1=5&num2=7'
+GET /cgi-bin/simple.py?num1=5&num2=7 HTTP/1.1
+Server: PetkoWS/1.0 (MacOS)
+Content-Type: text/html
+...
+
+$ ./client /static/example_org.html
+GET /static/example_org.html HTTP/1.1
+Server: PetkoWS/1.0 (MacOS)
+Content-Type: text/html
+...
+
 ```
 
 ### Debugging
